@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>STRING CIRCLE — World Country Battle</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000000;
+      color: #ffffff;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+    .glass-panel {
+      background: rgba(16, 16, 20, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.36);
+    }
+    input[type="range"] {
+      accent-color: #ffffff;
+    }
+    .clean-mode .ui-chrome {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
+    .ui-chrome {
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+  </style>
+</head>
+<body class="bg-black text-white flex flex-col h-full w-full overflow-hidden">
+
+  <!-- Top Header -->
+  <header class="relative z-20 flex items-center justify-between px-4 pt-3 pb-1 shrink-0">
+    <div class="w-24 flex items-center gap-2 ui-chrome">
+      <button id="btnSetup" type="button" title="Select Countries"
+        class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold tracking-wide transition flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>Countries</span>
+      </button>
+    </div>
+
+    <h1 class="text-sm sm:text-base md:text-lg font-black tracking-[0.22em] uppercase text-white select-none text-center">
+      STRING CIRCLE
+    </h1>
+
+    <div class="w-24 flex items-center justify-end gap-1.5">
+      <button id="btnMute" type="button" title="Toggle Sound"
+        class="ui-chrome p-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 transition">
+        <svg id="iconSoundOn" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        <svg id="iconSoundOff" class="w-4 h-4 hidden text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+      </button>
+      <button id="btnClean" type="button" title="Clean / Record Mode"
+        class="p-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 transition">
+        <svg id="iconEyeOpen" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg id="iconEyeClosed" class="w-4 h-4 hidden text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Live Scoreboard Strip -->
+  <div id="scoreboard" class="ui-chrome relative z-10 flex flex-wrap items-center justify-center gap-2 px-3 py-1.5 shrink-0">
+    <!-- Populated dynamically -->
+  </div>
+
+  <!-- Main Canvas Arena -->
+  <main id="arenaWrap" class="relative flex-1 w-full min-h-0 flex items-center justify-center overflow-hidden">
+    <canvas id="gameCanvas" class="block w-full h-full"></canvas>
+
+    <!-- Winner Banner Overlay -->
+    <div id="winnerOverlay" class="hidden absolute inset-0 z-20 flex items-center justify-center bg-black/65 backdrop-blur-sm p-4">
+      <div class="glass-panel rounded-2xl p-6 max-w-xs w-full text-center shadow-2xl border border-white/20">
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-amber-400 mb-2">Winner</div>
+        <div id="winnerFlagWrap" class="mx-auto w-20 h-20 rounded-full overflow-hidden border-2 border-white flex items-center justify-center bg-zinc-900 mb-3 shadow-lg">
+          <img id="winnerFlagImg" alt="Winner Flag" class="w-full h-full object-cover hidden" />
+          <span id="winnerFlagEmoji" class="text-4xl"></span>
+        </div>
+        <h2 id="winnerName" class="text-2xl font-extrabold tracking-tight text-white">India</h2>
+        <p id="winnerStats" class="text-xs text-zinc-400 mt-1 mb-5">Remaining Strings: 1 • Time: 42.1s</p>
+        <div class="flex gap-2 justify-center">
+          <button id="btnWinnerReplay" type="button"
+            class="flex-1 py-2.5 px-4 rounded-xl bg-white text-black font-bold text-sm hover:bg-zinc-200 transition">
+            Play Again
+          </button>
+          <button id="btnWinnerSetup" type="button"
+            class="py-2.5 px-4 rounded-xl bg-white/10 text-white font-semibold text-sm hover:bg-white/20 border border-white/15 transition">
+            Countries
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Control Bar -->
+  <footer class="ui-chrome relative z-20 px-3 pb-3 pt-1 shrink-0 flex items-center justify-center">
+    <div class="glass-panel rounded-2xl px-3 py-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 max-w-2xl w-full">
+      <button id="btnPlayPause" type="button"
+        class="px-4 py-2 rounded-xl bg-white text-black font-bold text-xs sm:text-sm hover:bg-zinc-200 transition flex items-center gap-1.5 min-w-[92px] justify-center">
+        <span id="playPauseLabel">Start</span>
+      </button>
+
+      <button id="btnRestart" type="button"
+        class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-semibold transition">
+        Restart
+      </button>
+
+      <button id="btnRandom" type="button"
+        class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-semibold transition">
+        Random
+      </button>
+
+      <div class="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
+        <span class="text-[11px] text-zinc-400 font-semibold px-1.5">Count:</span>
+        <button data-count="2" type="button" class="count-quick-btn px-2 py-1 rounded-lg text-xs font-bold transition">2</button>
+        <button data-count="3" type="button" class="count-quick-btn px-2 py-1 rounded-lg text-xs font-bold transition">3</button>
+        <button data-count="4" type="button" class="count-quick-btn px-2 py-1 rounded-lg text-xs font-bold transition">4</button>
+        <button data-count="5" type="button" class="count-quick-btn px-2 py-1 rounded-lg text-xs font-bold transition">5</button>
+      </div>
+
+      <button id="btnSpeed" type="button"
+        class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold tabular-nums transition">
+        1.0x
+      </button>
+    </div>
+  </footer>
+
+  <!-- Setup Drawer / Modal -->
+  <div id="setupModal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4">
+    <div class="glass-panel rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-white/15">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
+        <div>
+          <h2 class="text-base sm:text-lg font-extrabold tracking-tight">Setup Countries & Colors</h2>
+          <p class="text-xs text-zinc-400">Pick 2 to 5 countries from all 195 world nations</p>
+        </div>
+        <button id="btnCloseSetup" type="button" class="p-1.5 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+        <!-- Count Selector -->
+        <div class="flex items-center justify-between gap-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Number of Countries (Max 5)</span>
+          <div class="flex gap-1.5">
+            <button data-modal-count="2" type="button" class="modal-count-btn w-9 h-9 rounded-xl text-sm font-extrabold border transition">2</button>
+            <button data-modal-count="3" type="button" class="modal-count-btn w-9 h-9 rounded-xl text-sm font-extrabold border transition">3</button>
+            <button data-modal-count="4" type="button" class="modal-count-btn w-9 h-9 rounded-xl text-sm font-extrabold border transition">4</button>
+            <button data-modal-count="5" type="button" class="modal-count-btn w-9 h-9 rounded-xl text-sm font-extrabold border transition">5</button>
+          </div>
+        </div>
+
+        <!-- Slots List -->
+        <div id="slotList" class="space-y-2.5">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Strings Slider -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-zinc-300">Strings per Country</span>
+            <span id="stringsValLabel" class="font-bold text-white tabular-nums">50</span>
+          </div>
+          <input id="stringsSlider" type="range" min="1" max="80" step="1" value="50" class="w-full cursor-pointer" />
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 border-t border-white/10 flex items-center justify-between gap-2 shrink-0 bg-black/40">
+        <button id="btnModalRandom" type="button"
+          class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs sm:text-sm font-semibold border border-white/15 transition">
+          Shuffle All
+        </button>
+        <button id="btnApplyStart" type="button"
+          class="px-5 py-2.5 rounded-xl bg-white text-black hover:bg-zinc-200 text-xs sm:text-sm font-extrabold transition">
+          Apply & Start Battle
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- World Country Picker Sub-Modal -->
+  <div id="pickerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4">
+    <div class="glass-panel rounded-2xl w-full max-w-md max-h-[82vh] flex flex-col overflow-hidden shadow-2xl border border-white/20">
+      <div class="px-4 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0">
+        <h3 id="pickerTitle" class="text-sm font-extrabold uppercase tracking-wider text-white">Select Country</h3>
+        <button id="btnClosePicker" type="button" class="p-1.5 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="p-3 border-b border-white/10 shrink-0">
+        <input id="countrySearch" type="text" placeholder="Search any country (e.g. India, Japan, Brazil)..."
+          class="w-full px-3.5 py-2.5 rounded-xl bg-white/10 border border-white/15 text-sm text-white placeholder-zinc-400 focus:outline-none focus:border-white/50" />
+      </div>
+      <div id="countryList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      // Complete 195 World Sovereign Countries (ISO 3166-1 alpha-2)
+      const WORLD_COUNTRIES = [
+        ["AF","Afghanistan"],["AL","Albania"],["DZ","Algeria"],["AD","Andorra"],["AO","Angola"],
+        ["AG","Antigua and Barbuda"],["AR","Argentina"],["AM","Armenia"],["AU","Australia"],["AT","Austria"],
+        ["AZ","Azerbaijan"],["BS","Bahamas"],["BH","Bahrain"],["BD","Bangladesh"],["BB","Barbados"],
+        ["BY","Belarus"],["BE","Belgium"],["BZ","Belize"],["BJ","Benin"],["BT","Bhutan"],
+        ["BO","Bolivia"],["BA","Bosnia and Herzegovina"],["BW","Botswana"],["BR","Brazil"],["BN","Brunei"],
+        ["BG","Bulgaria"],["BF","Burkina Faso"],["BI","Burundi"],["CV","Cabo Verde"],["KH","Cambodia"],
+        ["CM","Cameroon"],["CA","Canada"],["CF","Central African Republic"],["TD","Chad"],["CL","Chile"],
+        ["CN","China"],["CO","Colombia"],["KM","Comoros"],["CG","Congo"],["CD","DR Congo"],
+        ["CR","Costa Rica"],["CI","Ivory Coast"],["HR","Croatia"],["CU","Cuba"],["CY","Cyprus"],
+        ["CZ","Czechia"],["DK","Denmark"],["DJ","Djibouti"],["DM","Dominica"],["DO","Dominican Republic"],
+        ["EC","Ecuador"],["EG","Egypt"],["SV","El Salvador"],["GQ","Equatorial Guinea"],["ER","Eritrea"],
+        ["EE","Estonia"],["SZ","Eswatini"],["ET","Ethiopia"],["FJ","Fiji"],["FI","Finland"],
+        ["FR","France"],["GA","Gabon"],["GM","Gambia"],["GE","Georgia"],["DE","Germany"],
+        ["GH","Ghana"],["GR","Greece"],["GD","Grenada"],["GT","Guatemala"],["GN","Guinea"],
+        ["GW","Guinea-Bissau"],["GY","Guyana"],["HT","Haiti"],["HN","Honduras"],["HU","Hungary"],
+        ["IS","Iceland"],["IN","India"],["ID","Indonesia"],["IR","Iran"],["IQ","Iraq"],
+        ["IE","Ireland"],["IL","Israel"],["IT","Italy"],["JM","Jamaica"],["JP","Japan"],
+        ["JO","Jordan"],["KZ","Kazakhstan"],["KE","Kenya"],["KI","Kiribati"],["KP","North Korea"],
+        ["KR","South Korea"],["KW","Kuwait"],["KG","Kyrgyzstan"],["LA","Laos"],["LV","Latvia"],
+        ["LB","Lebanon"],["LS","Lesotho"],["LR","Liberia"],["LY","Libya"],["LI","Liechtenstein"],
+        ["LT","Lithuania"],["LU","Luxembourg"],["MG","Madagascar"],["MW","Malawi"],["MY","Malaysia"],
+        ["MV","Maldives"],["ML","Mali"],["MT","Malta"],["MH","Marshall Islands"],["MR","Mauritania"],
+        ["MU","Mauritius"],["MX","Mexico"],["FM","Micronesia"],["MD","Moldova"],["MC","Monaco"],
+        ["MN","Mongolia"],["ME","Montenegro"],["MA","Morocco"],["MZ","Mozambique"],["MM","Myanmar"],
+        ["NA","Namibia"],["NR","Nauru"],["NP","Nepal"],["NL","Netherlands"],["NZ","New Zealand"],
+        ["NI","Nicaragua"],["NE","Niger"],["NG","Nigeria"],["MK","North Macedonia"],["NO","Norway"],
+        ["OM","Oman"],["PK","Pakistan"],["PW","Palau"],["PS","Palestine"],["PA","Panama"],
+        ["PG","Papua New Guinea"],["PY","Paraguay"],["PE","Peru"],["PH","Philippines"],["PL","Poland"],
+        ["PT","Portugal"],["QA","Qatar"],["RO","Romania"],["RU","Russia"],["RW","Rwanda"],
+        ["KN","Saint Kitts and Nevis"],["LC","Saint Lucia"],["VC","Saint Vincent"],["WS","Samoa"],["SM","San Marino"],
+        ["ST","Sao Tome and Principe"],["SA","Saudi Arabia"],["SN","Senegal"],["RS","Serbia"],["SC","Seychelles"],
+        ["SL","Sierra Leone"],["SG","Singapore"],["SK","Slovakia"],["SI","Slovenia"],["SB","Solomon Islands"],
+        ["SO","Somalia"],["ZA","South Africa"],["SS","South Sudan"],["ES","Spain"],["LK","Sri Lanka"],
+        ["SD","Sudan"],["SR","Suriname"],["SE","Sweden"],["CH","Switzerland"],["SY","Syria"],
+        ["TJ","Tajikistan"],["TZ","Tanzania"],["TH","Thailand"],["TL","Timor-Leste"],["TG","Togo"],
+        ["TO","Tonga"],["TT","Trinidad and Tobago"],["TN","Tunisia"],["TR","Turkey"],["TM","Turkmenistan"],
+        ["TV","Tuvalu"],["UG","Uganda"],["UA","Ukraine"],["AE","UAE"],["GB","United Kingdom"],
+        ["US","United States"],["UY","Uruguay"],["UZ","Uzbekistan"],["VU","Vanuatu"],["VA","Vatican City"],
+        ["VE","Venezuela"],["VN","Vietnam"],["YE","Yemen"],["ZM","Zambia"],["ZW","Zimbabwe"]
+      ].map(([code, name]) => ({
+        code,
+        name,
+        emoji: code.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)))
+      }));
+
+      const COUNTRY_BY_CODE = Object.fromEntries(WORLD_COUNTRIES.map(c => [c.code, c]));
+
+      const DEFAULT_PALETTE = [
+        "#ff3b3b", // Red
+        "#ff9500", // Orange
+        "#ffd60a", // Yellow
+        "#00e5ff", // Cyan
+        "#a855f7", // Purple
+        "#22c55e", // Green
+        "#ec4899", // Pink
+        "#3b82f6"  // Blue
+      ];
+
+      // Flag Image Cache
+      const flagImgCache = {};
+      function getFlagImage(code) {
+        if (flagImgCache[code]) return flagImgCache[code];
+        const entry = { img: new Image(), loaded: false, failed: false };
+        entry.img.crossOrigin = "anonymous";
+        entry.img.onload = () => { entry.loaded = true; };
+        entry.img.onerror = () => { entry.failed = true; };
+        entry.img.src = `https://flagcdn.com/w160/${code.toLowerCase()}.png`;
+        flagImgCache[code] = entry;
+        return entry;
+      }
+
+      // Synthesized Web Audio Engine (no external audio files)
+      let audioCtx = null;
+      let isMuted = false;
+      let lastSnapTime = 0;
+
+      function ensureAudio() {
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === "suspended") {
+          audioCtx.resume().catch(() => {});
+        }
+      }
+
+      function playSnapSound() {
+        if (isMuted || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        if (now - lastSnapTime < 0.028) return; // avoid clipping on rapid cuts
+        lastSnapTime = now;
+
+        // Crisp punchy snare/thwack burst like the video
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(190 + Math.random() * 60, now);
+        osc.frequency.exponentialRampToValueAtTime(55, now + 0.065);
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+
+        // Short filtered noise crack
+        const bufSize = Math.floor(audioCtx.sampleRate * 0.045);
+        const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.35));
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buf;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.value = 1400;
+        const nGain = audioCtx.createGain();
+        nGain.gain.setValueAtTime(0.18, now);
+        nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+        noise.connect(filter);
+        filter.connect(nGain);
+        nGain.connect(audioCtx.destination);
+        noise.start(now);
+      }
+
+      function playBounceSound() {
+        if (isMuted || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(125, now);
+        osc.frequency.exponentialRampToValueAtTime(48, now + 0.06);
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      }
+
+      function playEliminationSound() {
+        if (isMuted || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.exponentialRampToValueAtTime(42, now + 0.28);
+        gain.gain.setValueAtTime(0.24, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.31);
+      }
+
+      function playVictorySound() {
+        if (isMuted || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+          gain.gain.setValueAtTime(0.18, now + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.09);
+          osc.stop(now + idx * 0.09 + 0.36);
+        });
+      }
+
+      // App State
+      const state = {
+        countryCount: 3,
+        stringsPerCountry: 50,
+        speedMultipliers: [0.75, 1.0, 1.5, 2.0],
+        speedIdx: 1,
+        slots: [
+          { code: "US", color: "#ff3b3b" },
+          { code: "IN", color: "#ff9500" },
+          { code: "CN", color: "#ffd60a" },
+          { code: "BR", color: "#22c55e" },
+          { code: "JP", color: "#00e5ff" }
+        ],
+        running: false,
+        finished: false,
+        cleanMode: false,
+        elapsed: 0,
+        balls: [],
+        particles: [],
+        rimFlashes: [],
+        editingSlotIdx: 0
+      };
+
+      // DOM Elements
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const arenaWrap = document.getElementById("arenaWrap");
+      const scoreboard = document.getElementById("scoreboard");
+      const winnerOverlay = document.getElementById("winnerOverlay");
+      const winnerFlagImg = document.getElementById("winnerFlagImg");
+      const winnerFlagEmoji = document.getElementById("winnerFlagEmoji");
+      const winnerName = document.getElementById("winnerName");
+      const winnerStats = document.getElementById("winnerStats");
+
+      const btnPlayPause = document.getElementById("btnPlayPause");
+      const playPauseLabel = document.getElementById("playPauseLabel");
+      const btnRestart = document.getElementById("btnRestart");
+      const btnRandom = document.getElementById("btnRandom");
+      const btnSpeed = document.getElementById("btnSpeed");
+      const btnMute = document.getElementById("btnMute");
+      const iconSoundOn = document.getElementById("iconSoundOn");
+      const iconSoundOff = document.getElementById("iconSoundOff");
+      const btnClean = document.getElementById("btnClean");
+      const iconEyeOpen = document.getElementById("iconEyeOpen");
+      const iconEyeClosed = document.getElementById("iconEyeClosed");
+
+      const btnSetup = document.getElementById("btnSetup");
+      const setupModal = document.getElementById("setupModal");
+      const btnCloseSetup = document.getElementById("btnCloseSetup");
+      const slotList = document.getElementById("slotList");
+      const stringsSlider = document.getElementById("stringsSlider");
+      const stringsValLabel = document.getElementById("stringsValLabel");
+      const btnModalRandom = document.getElementById("btnModalRandom");
+      const btnApplyStart = document.getElementById("btnApplyStart");
+      const btnWinnerReplay = document.getElementById("btnWinnerReplay");
+      const btnWinnerSetup = document.getElementById("btnWinnerSetup");
+
+      const pickerModal = document.getElementById("pickerModal");
+      const pickerTitle = document.getElementById("pickerTitle");
+      const btnClosePicker = document.getElementById("btnClosePicker");
+      const countrySearch = document.getElementById("countrySearch");
+      const countryList = document.getElementById("countryList");
+
+      // Arena Geometry (computed dynamically on resize)
+      let cx = 0;
+      let cy = 0;
+      let arenaR = 160;
+      let ballR = 18;
+      let dpr = 1;
+
+      function resizeCanvas() {
+        const rect = arenaWrap.getBoundingClientRect();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+        canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const prevCx = cx;
+        const prevCy = cy;
+        const prevR = arenaR;
+
+        cx = rect.width / 2;
+        cy = rect.height / 2;
+        arenaR = Math.max(90, Math.min(rect.width, rect.height) * 0.43);
+        ballR = Math.max(13, Math.min(24, arenaR * 0.095));
+
+        // Rescale existing ball positions proportionally if battle is active
+        if (prevR > 0 && state.balls.length > 0) {
+          const scale = arenaR / prevR;
+          for (const b of state.balls) {
+            b.x = cx + (b.x - prevCx) * scale;
+            b.y = cy + (b.y - prevCy) * scale;
+            b.r = ballR;
+          }
+        }
+        drawFrame();
+      }
+
+      // Geometry Helper: distance from point (px,py) to line segment (x1,y1)-(x2,y2)
+      function distPointToSegment(px, py, x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const lenSq = dx * dx + dy * dy;
+        if (lenSq < 1e-6) return Math.hypot(px - x1, py - y1);
+        let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+        t = Math.max(0, Math.min(0.95, t)); // slight margin at owner center
+        const projX = x1 + t * dx;
+        const projY = y1 + t * dy;
+        return Math.hypot(px - projX, py - projY);
+      }
+
+      // Initialize a fresh battle
+      function initBattle(autoStart = false) {
+        winnerOverlay.classList.add("hidden");
+        state.finished = false;
+        state.elapsed = 0;
+        state.particles = [];
+        state.rimFlashes = [];
+
+        const count = state.countryCount;
+        const activeSlots = state.slots.slice(0, count);
+        const arcSpan = (Math.PI * 2) / count;
+        const usableArc = arcSpan * 0.72; // distinct fan per country like the video
+        const baseSpeed = Math.max(175, arenaR * 1.15);
+
+        state.balls = activeSlots.map((slot, idx) => {
+          const country = COUNTRY_BY_CODE[slot.code] || WORLD_COUNTRIES[0];
+          getFlagImage(country.code); // preload flag
+
+          const centerAngle = -Math.PI / 2 + idx * arcSpan;
+          const startAngle = centerAngle - usableArc / 2;
+          const strings = [];
+          const n = state.stringsPerCountry;
+          for (let i = 0; i < n; i++) {
+            const frac = n === 1 ? 0.5 : i / (n - 1);
+            strings.push({ angle: startAngle + frac * usableArc });
+          }
+
+          // Place ball inward along its sector
+          const spawnDist = arenaR * 0.45;
+          const bx = cx + Math.cos(centerAngle) * spawnDist;
+          const by = cy + Math.sin(centerAngle) * spawnDist;
+
+          // Launch direction slightly angled inward for immediate lively action
+          const launchAngle = centerAngle + Math.PI + (Math.random() - 0.5) * 1.15;
+          return {
+            id: idx,
+            code: country.code,
+            name: country.name,
+            emoji: country.emoji,
+            color: slot.color,
+            x: bx,
+            y: by,
+            vx: Math.cos(launchAngle) * baseSpeed,
+            vy: Math.sin(launchAngle) * baseSpeed,
+            r: ballR,
+            strings,
+            alive: true,
+            cutCooldown: 0.35 // brief grace period at frame 0
+          };
+        });
+
+        state.running = autoStart;
+        updateControlsUI();
+        renderScoreboard();
+        drawFrame();
+      }
+
+      function spawnParticles(x, y, color, count, speedScale = 1) {
+        for (let i = 0; i < count; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const sp = (40 + Math.random() * 140) * speedScale;
+          state.particles.push({
+            x, y,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp,
+            life: 0.35 + Math.random() * 0.3,
+            maxLife: 0.65,
+            color,
+            size: 1.5 + Math.random() * 2.5
+          });
+        }
+      }
+
+      // Physics Step
+      function stepPhysics(dt) {
+        if (!state.running || state.finished) return;
+
+        const speedMult = state.speedMultipliers[state.speedIdx];
+        const simDt = Math.min(dt, 0.04) * speedMult;
+        state.elapsed += simDt;
+
+        const substeps = 3;
+        const subDt = simDt / substeps;
+        const targetSpeed = Math.max(175, arenaR * 1.18);
+        const gravity = arenaR * 0.32;
+
+        let scoreboardDirty = false;
+
+        for (let s = 0; s < substeps; s++) {
+          // 1. Move balls & circle wall bounce
+          for (const b of state.balls) {
+            if (!b.alive) continue;
+            if (b.cutCooldown > 0) b.cutCooldown -= subDt;
+
+            // Gentle gravity + constant energy regulation so balls never stall
+            b.vy += gravity * subDt;
+            b.x += b.vx * subDt;
+            b.y += b.vy * subDt;
+
+            const dx = b.x - cx;
+            const dy = b.y - cy;
+            const dist = Math.hypot(dx, dy);
+            const maxDist = arenaR - b.r - 1.5;
+
+            if (dist > maxDist && dist > 0) {
+              const nx = dx / dist;
+              const ny = dy / dist;
+              b.x = cx + nx * maxDist;
+              b.y = cy + ny * maxDist;
+
+              const dot = b.vx * nx + b.vy * ny;
+              if (dot > 0) {
+                b.vx -= 2 * dot * nx;
+                b.vy -= 2 * dot * ny;
+                // Tiny angular perturbation prevents infinite boring loops
+                const jitter = (Math.random() - 0.5) * 0.14;
+                const cosJ = Math.cos(jitter);
+                const sinJ = Math.sin(jitter);
+                const nvx = b.vx * cosJ - b.vy * sinJ;
+                const nvy = b.vx * sinJ + b.vy * cosJ;
+                b.vx = nvx;
+                b.vy = nvy;
+
+                const bounceAngle = Math.atan2(ny, nx);
+                if (b.strings.length < 150) {
+                  b.strings.push({ angle: bounceAngle });
+                  scoreboardDirty = true;
+                }
+                playBounceSound();
+                state.rimFlashes.push({
+                  angle: bounceAngle,
+                  color: b.color,
+                  life: 0.22
+                });
+              }
+            }
+
+            // Gently regulate speed to keep pace energetic
+            const curSpeed = Math.hypot(b.vx, b.vy);
+            if (curSpeed > 0.01) {
+              const blend = curSpeed + (targetSpeed - curSpeed) * 0.04;
+              b.vx = (b.vx / curSpeed) * blend;
+              b.vy = (b.vy / curSpeed) * blend;
+            }
+          }
+
+          // 2. Ball-to-ball elastic collisions
+          for (let i = 0; i < state.balls.length; i++) {
+            const a = state.balls[i];
+            if (!a.alive) continue;
+            for (let j = i + 1; j < state.balls.length; j++) {
+              const b = state.balls[j];
+              if (!b.alive) continue;
+              const dx = b.x - a.x;
+              const dy = b.y - a.y;
+              const dist = Math.hypot(dx, dy);
+              const minDist = a.r + b.r;
+              if (dist < minDist && dist > 0.001) {
+                const nx = dx / dist;
+                const ny = dy / dist;
+                const overlap = (minDist - dist) * 0.5;
+                a.x -= nx * overlap;
+                a.y -= ny * overlap;
+                b.x += nx * overlap;
+                b.y += ny * overlap;
+
+                const dvx = b.vx - a.vx;
+                const dvy = b.vy - a.vy;
+                const relVel = dvx * nx + dvy * ny;
+                if (relVel < 0) {
+                  a.vx += relVel * nx;
+                  a.vy += relVel * ny;
+                  b.vx -= relVel * nx;
+                  b.vy -= relVel * ny;
+                  playBounceSound();
+                }
+              }
+            }
+          }
+
+          // 3. Opponent ball cuts strings (paced per-cut cooldown for exciting 25-45s battles)
+          for (const cutter of state.balls) {
+            if (!cutter.alive || cutter.cutCooldown > 0) continue;
+            let didCut = false;
+            for (const owner of state.balls) {
+              if (!owner.alive || owner.id === cutter.id) continue;
+              let closestIdx = -1;
+              let closestDist = cutter.r * 0.9;
+              for (let k = owner.strings.length - 1; k >= 0; k--) {
+                const st = owner.strings[k];
+                const ax = cx + Math.cos(st.angle) * arenaR;
+                const ay = cy + Math.sin(st.angle) * arenaR;
+                const d = distPointToSegment(cutter.x, cutter.y, ax, ay, owner.x, owner.y);
+                if (d <= closestDist) {
+                  closestDist = d;
+                  closestIdx = k;
+                }
+              }
+              if (closestIdx !== -1) {
+                owner.strings.splice(closestIdx, 1);
+                cutter.cutCooldown = 0.065;
+                scoreboardDirty = true;
+                playSnapSound();
+                spawnParticles(cutter.x, cutter.y, owner.color, 4, 0.7);
+                didCut = true;
+
+                if (owner.strings.length === 0 && owner.alive) {
+                  owner.alive = false;
+                  playEliminationSound();
+                  spawnParticles(owner.x, owner.y, owner.color, 28, 1.4);
+                }
+                break;
+              }
+            }
+            if (didCut) continue;
+          }
+        }
+
+        // Update visual particles & rim flashes
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vx *= 0.94;
+          p.vy *= 0.94;
+          p.life -= dt;
+          if (p.life <= 0) state.particles.splice(i, 1);
+        }
+        for (let i = state.rimFlashes.length - 1; i >= 0; i--) {
+          state.rimFlashes[i].life -= dt;
+          if (state.rimFlashes[i].life <= 0) state.rimFlashes.splice(i, 1);
+        }
+
+        if (scoreboardDirty) renderScoreboard();
+
+        // Check Winner
+        const aliveBalls = state.balls.filter(b => b.alive);
+        if (aliveBalls.length <= 1 && state.balls.length >= 2) {
+          state.finished = true;
+          state.running = false;
+          updateControlsUI();
+          playVictorySound();
+          showWinner(aliveBalls[0] || state.balls[0]);
+        }
+      }
+
+      // Render Canvas Frame
+      function drawFrame() {
+        const w = canvas.width / dpr;
+        const h = canvas.height / dpr;
+        ctx.clearRect(0, 0, w, h);
+
+        // Pure black background
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, w, h);
+
+        // Clip interior softly for strings
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, arenaR, 0, Math.PI * 2);
+        ctx.clip();
+
+        // 1. Draw all strings
+        for (const b of state.balls) {
+          if (!b.alive) continue;
+          ctx.save();
+          ctx.strokeStyle = b.color;
+          ctx.lineWidth = 1.25;
+          ctx.globalAlpha = 0.85;
+          ctx.beginPath();
+          for (const st of b.strings) {
+            const ax = cx + Math.cos(st.angle) * arenaR;
+            const ay = cy + Math.sin(st.angle) * arenaR;
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(b.x, b.y);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 2. Draw particles
+        for (const p of state.particles) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 3. Draw country balls with circular flags & colored glow
+        for (const b of state.balls) {
+          if (!b.alive) continue;
+
+          // Outer glow halo
+          ctx.save();
+          ctx.shadowColor = b.color;
+          ctx.shadowBlur = 18;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fillStyle = "#111111";
+          ctx.fill();
+          ctx.restore();
+
+          // Circular clipped flag
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r - 1.5, 0, Math.PI * 2);
+          ctx.clip();
+
+          const flagEntry = getFlagImage(b.code);
+          if (flagEntry.loaded && !flagEntry.failed) {
+            // Cover-fit image into circle
+            const iw = flagEntry.img.naturalWidth || 160;
+            const ih = flagEntry.img.naturalHeight || 100;
+            const size = (b.r - 1) * 2;
+            const scale = Math.max(size / iw, size / ih);
+            const dw = iw * scale;
+            const dh = ih * scale;
+            ctx.drawImage(flagEntry.img, b.x - dw / 2, b.y - dh / 2, dw, dh);
+          } else {
+            // Instant crisp fallback: colored disc + emoji + ISO code
+            ctx.fillStyle = "#18181b";
+            ctx.fillRect(b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+            ctx.font = `${Math.round(b.r * 1.15)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(b.emoji, b.x, b.y + 1);
+          }
+          ctx.restore();
+
+          // Colored ring outline
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.strokeStyle = b.color;
+          ctx.lineWidth = 2.4;
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore(); // end interior clip
+
+        // 4. Outer white arena circle
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, arenaR, 0, Math.PI * 2);
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+        ctx.restore();
+
+        // 5. Rim bounce flashes
+        for (const f of state.rimFlashes) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(cx, cy, arenaR, f.angle - 0.14, f.angle + 0.14);
+          ctx.strokeStyle = f.color;
+          ctx.lineWidth = 4;
+          ctx.globalAlpha = Math.max(0, f.life / 0.22);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      // Render Live Scoreboard
+      function renderScoreboard() {
+        scoreboard.innerHTML = "";
+        for (const b of state.balls) {
+          const pill = document.createElement("div");
+          pill.className = `flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold transition ${
+            b.alive
+              ? "bg-white/5 border-white/15 text-white"
+              : "bg-white/[0.02] border-white/5 text-zinc-600 line-through opacity-55"
+          }`;
+          pill.innerHTML = `
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${b.color}; box-shadow: 0 0 8px ${b.color}"></span>
+            <span class="text-sm leading-none">${b.emoji}</span>
+            <span class="max-w-[78px] truncate">${b.name}</span>
+            <span class="tabular-nums text-[11px] px-1.5 py-0.5 rounded-md bg-white/10">${b.strings.length}</span>
+          `;
+          scoreboard.appendChild(pill);
+        }
+      }
+
+      function showWinner(ball) {
+        if (!ball) return;
+        winnerName.textContent = ball.name;
+        winnerStats.textContent = `Strings Left: ${ball.strings.length} • Time: ${state.elapsed.toFixed(1)}s`;
+        const flagEntry = getFlagImage(ball.code);
+        if (flagEntry.loaded && !flagEntry.failed) {
+          winnerFlagImg.src = flagEntry.img.src;
+          winnerFlagImg.classList.remove("hidden");
+          winnerFlagEmoji.classList.add("hidden");
+        } else {
+          winnerFlagImg.classList.add("hidden");
+          winnerFlagEmoji.textContent = ball.emoji;
+          winnerFlagEmoji.classList.remove("hidden");
+        }
+        document.getElementById("winnerFlagWrap").style.borderColor = ball.color;
+        document.getElementById("winnerFlagWrap").style.boxShadow = `0 0 28px ${ball.color}66`;
+        winnerOverlay.classList.remove("hidden");
+      }
+
+      function updateControlsUI() {
+        if (state.finished) {
+          playPauseLabel.textContent = "Replay";
+        } else {
+          playPauseLabel.textContent = state.running ? "Pause" : "Start";
+        }
+        btnSpeed.textContent = `${state.speedMultipliers[state.speedIdx].toFixed(2).replace(/\.00$/, ".0")}x`;
+
+        document.querySelectorAll(".count-quick-btn").forEach(btn => {
+          const val = Number(btn.dataset.count);
+          if (val === state.countryCount) {
+            btn.className = "count-quick-btn px-2 py-1 rounded-lg text-xs font-bold transition bg-white text-black";
+          } else {
+            btn.className = "count-quick-btn px-2 py-1 rounded-lg text-xs font-bold transition text-zinc-400 hover:text-white hover:bg-white/10";
+          }
+        });
+      }
+
+      // Randomize unique countries
+      function randomizeCountries(startImmediately = false) {
+        const pool = [...WORLD_COUNTRIES];
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        for (let i = 0; i < 5; i++) {
+          state.slots[i].code = pool[i].code;
+          state.slots[i].color = DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
+        }
+        renderSetupSlots();
+        initBattle(startImmediately);
+      }
+
+      // Setup Modal Rendering
+      function renderSetupSlots() {
+        document.querySelectorAll(".modal-count-btn").forEach(btn => {
+          const val = Number(btn.dataset.modalCount);
+          if (val === state.countryCount) {
+            btn.className = "modal-count-btn w-9 h-9 rounded-xl text-sm font-extrabold border transition bg-white text-black border-white";
+          } else {
+            btn.className = "modal-count-btn w-9 h-9 rounded-xl text-sm font-extrabold border transition bg-white/5 text-zinc-300 border-white/15 hover:bg-white/15";
+          }
+        });
+
+        slotList.innerHTML = "";
+        for (let i = 0; i < state.countryCount; i++) {
+          const slot = state.slots[i];
+          const country = COUNTRY_BY_CODE[slot.code] || WORLD_COUNTRIES[0];
+          const row = document.createElement("div");
+          row.className = "flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-xl p-2.5";
+
+          const colorInput = document.createElement("input");
+          colorInput.type = "color";
+          colorInput.value = slot.color;
+          colorInput.title = "Pick string & ring color";
+          colorInput.className = "w-9 h-9 rounded-lg bg-transparent border-0 cursor-pointer shrink-0";
+          colorInput.addEventListener("input", (e) => {
+            state.slots[i].color = e.target.value;
+          });
+
+          const pickBtn = document.createElement("button");
+          pickBtn.type = "button";
+          pickBtn.className = "flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-left transition";
+          pickBtn.innerHTML = `
+            <span class="flex items-center gap-2.5 min-w-0">
+              <span class="text-xl leading-none">${country.emoji}</span>
+              <span class="font-bold text-sm text-white truncate">${country.name}</span>
+            </span>
+            <span class="text-[11px] font-semibold text-zinc-400 shrink-0">Change ▾</span>
+          `;
+          pickBtn.addEventListener("click", () => openCountryPicker(i));
+
+          row.appendChild(colorInput);
+          row.appendChild(pickBtn);
+          slotList.appendChild(row);
+        }
+
+        stringsSlider.value = state.stringsPerCountry;
+        stringsValLabel.textContent = String(state.stringsPerCountry);
+      }
+
+      function openCountryPicker(slotIdx) {
+        state.editingSlotIdx = slotIdx;
+        pickerTitle.textContent = `Choose Country #${slotIdx + 1}`;
+        countrySearch.value = "";
+        renderCountryPickerList("");
+        pickerModal.classList.remove("hidden");
+        setTimeout(() => countrySearch.focus(), 40);
+      }
+
+      function renderCountryPickerList(query) {
+        const q = query.trim().toLowerCase();
+        const usedCodes = new Set(
+          state.slots.slice(0, state.countryCount).map((s, idx) => idx === state.editingSlotIdx ? null : s.code)
+        );
+        const filtered = WORLD_COUNTRIES.filter(c =>
+          !q || c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)
+        );
+
+        countryList.innerHTML = "";
+        if (filtered.length === 0) {
+          countryList.innerHTML = `<div class="text-center text-xs text-zinc-400 py-8">No country found for "${query}"</div>`;
+          return;
+        }
+
+        for (const c of filtered) {
+          const isCurrent = state.slots[state.editingSlotIdx].code === c.code;
+          const isUsed = usedCodes.has(c.code);
+          const item = document.createElement("button");
+          item.type = "button";
+          item.disabled = isUsed;
+          item.className = `w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-sm transition ${
+            isCurrent
+              ? "bg-white text-black font-bold"
+              : isUsed
+                ? "opacity-35 cursor-not-allowed text-zinc-500"
+                : "hover:bg-white/10 text-zinc-100"
+          }`;
+          item.innerHTML = `
+            <span class="flex items-center gap-2.5 min-w-0">
+              <span class="text-lg leading-none">${c.emoji}</span>
+              <span class="truncate">${c.name}</span>
+            </span>
+            <span class="text-[11px] font-mono ${isCurrent ? "text-black/70" : "text-zinc-500"}">${isUsed ? "Selected" : c.code}</span>
+          `;
+          if (!isUsed) {
+            item.addEventListener("click", () => {
+              state.slots[state.editingSlotIdx].code = c.code;
+              pickerModal.classList.add("hidden");
+              renderSetupSlots();
+            });
+          }
+          countryList.appendChild(item);
+        }
+      }
+
+      // Event Listeners
+      btnPlayPause.addEventListener("click", () => {
+        ensureAudio();
+        if (state.finished) {
+          initBattle(true);
+          return;
+        }
+        state.running = !state.running;
+        updateControlsUI();
+      });
+
+      btnRestart.addEventListener("click", () => {
+        ensureAudio();
+        initBattle(true);
+      });
+
+      btnRandom.addEventListener("click", () => {
+        ensureAudio();
+        randomizeCountries(true);
+      });
+
+      btnSpeed.addEventListener("click", () => {
+        state.speedIdx = (state.speedIdx + 1) % state.speedMultipliers.length;
+        updateControlsUI();
+      });
+
+      btnMute.addEventListener("click", () => {
+        ensureAudio();
+        isMuted = !isMuted;
+        iconSoundOn.classList.toggle("hidden", isMuted);
+        iconSoundOff.classList.toggle("hidden", !isMuted);
+      });
+
+      btnClean.addEventListener("click", () => {
+        state.cleanMode = !state.cleanMode;
+        document.body.classList.toggle("clean-mode", state.cleanMode);
+        iconEyeOpen.classList.toggle("hidden", state.cleanMode);
+        iconEyeClosed.classList.toggle("hidden", !state.cleanMode);
+      });
+
+      document.querySelectorAll(".count-quick-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          ensureAudio();
+          state.countryCount = Number(btn.dataset.count);
+          renderSetupSlots();
+          initBattle(true);
+        });
+      });
+
+      document.querySelectorAll(".modal-count-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.countryCount = Number(btn.dataset.modalCount);
+          renderSetupSlots();
+        });
+      });
+
+      stringsSlider.addEventListener("input", () => {
+        state.stringsPerCountry = Number(stringsSlider.value);
+        stringsValLabel.textContent = String(state.stringsPerCountry);
+      });
+
+      btnSetup.addEventListener("click", () => {
+        state.running = false;
+        updateControlsUI();
+        renderSetupSlots();
+        setupModal.classList.remove("hidden");
+      });
+
+      btnCloseSetup.addEventListener("click", () => {
+        setupModal.classList.add("hidden");
+      });
+
+      btnModalRandom.addEventListener("click", () => {
+        randomizeCountries(false);
+      });
+
+      btnApplyStart.addEventListener("click", () => {
+        ensureAudio();
+        setupModal.classList.add("hidden");
+        initBattle(true);
+      });
+
+      btnWinnerReplay.addEventListener("click", () => {
+        ensureAudio();
+        initBattle(true);
+      });
+
+      btnWinnerSetup.addEventListener("click", () => {
+        winnerOverlay.classList.add("hidden");
+        renderSetupSlots();
+        setupModal.classList.remove("hidden");
+      });
+
+      btnClosePicker.addEventListener("click", () => {
+        pickerModal.classList.add("hidden");
+      });
+
+      countrySearch.addEventListener("input", () => {
+        renderCountryPickerList(countrySearch.value);
+      });
+
+      // Keyboard shortcuts: Space = Play/Pause, R = Restart, H = Clean Mode
+      window.addEventListener("keydown", (e) => {
+        if (document.activeElement === countrySearch) return;
+        if (e.code === "Space") {
+          e.preventDefault();
+          btnPlayPause.click();
+        } else if (e.key === "r" || e.key === "R") {
+          btnRestart.click();
+        } else if (e.key === "h" || e.key === "H") {
+          btnClean.click();
+        }
+      });
+
+      // Main Animation Loop
+      let lastTime = 0;
+      let rafId = null;
+
+      function loop(ts) {
+        if (!lastTime) lastTime = ts;
+        const dt = Math.min((ts - lastTime) / 1000, 0.05);
+        lastTime = ts;
+
+        stepPhysics(dt);
+        drawFrame();
+        rafId = requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("resize", resizeCanvas);
+
+      window.onload = () => {
+        resizeCanvas();
+        initBattle(true); // Start lively demo immediately on open
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(loop);
+      };
+    })();
+  </script>
+</body>
+</html>
